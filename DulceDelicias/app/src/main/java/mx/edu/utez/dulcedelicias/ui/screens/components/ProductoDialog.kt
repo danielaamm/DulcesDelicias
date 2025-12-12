@@ -21,10 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mx.edu.utez.dulcedelicias.data.network.model.Producto
 
-// --- Colores Temáticos (Definición Local para consistencia) ---
+
 val PrimaryBrown = Color(0xFF6D4C41)
 val BackgroundCream = Color(0xFFFFF8E1)
-// ----------------------------------------------------------------
 
 @Composable
 fun ProductoDialog(
