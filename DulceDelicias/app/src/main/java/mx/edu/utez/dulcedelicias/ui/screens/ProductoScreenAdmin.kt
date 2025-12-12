@@ -1,4 +1,4 @@
-package mx.edu.utez.dulcedelicias.ui.screens
+package mx.edu.utez.dulcedelicias.ui.screens.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,23 +13,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
 import mx.edu.utez.dulcedelicias.data.network.model.Producto
-import mx.edu.utez.dulcedelicias.ui.screens.components.ProductoDialog
-import mx.edu.utez.dulcedelicias.ui.screens.components.ProductoListAdmin
-import mx.edu.utez.dulcedelicias.ui.screens.components.ProductoUpdateDialog
 import mx.edu.utez.dulcedelicias.ui.screens.viewmodel.ProductoViewModel
-
-val PrimaryBrown = Color(0xFF6D4C41)
-val BackgroundCream = Color(0xFFFFF8E1)
-
+private object ProductoScreenAdminColors {
+    val DulceDeliciasPrimary = Color(0xFF6D4C41)
+    val DulceDeliciasOnPrimary = Color.White
+    val DulceDeliciasBackground = Color(0xFFFCF5E3)
+    val DulceDeliciasDanger = Color(0xFFB71C1C)
+}
 
 @Composable
 fun ProductoScreenAdmin(
     navController: NavController,
     viewModel: ProductoViewModel) {
-
     val productos by viewModel.products.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
@@ -41,21 +39,21 @@ fun ProductoScreenAdmin(
 
     Scaffold(
         modifier = Modifier.fillMaxWidth(),
+        containerColor = ProductoScreenAdminColors.DulceDeliciasBackground,
+
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { addDialog = true },
-                containerColor = PrimaryBrown,
-                contentColor = Color.White
+                containerColor = ProductoScreenAdminColors.DulceDeliciasPrimary,
+                contentColor = ProductoScreenAdminColors.DulceDeliciasOnPrimary
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "Agregar Producto"
                 )
             }
-        },
-        containerColor = BackgroundCream
+        }
     ) { innerPadding ->
-
         ProductoListAdmin(
             productos = productos,
             onEdit = { producto ->
@@ -66,6 +64,7 @@ fun ProductoScreenAdmin(
                 selectedProducto = producto
                 deleteConfirm = true
             },
+            modifier = Modifier.padding(innerPadding)
         )
 
         if (addDialog) {
@@ -110,17 +109,21 @@ fun ProductoScreenAdmin(
             }
         }
 
+        //Manejo de errores
         if (errorMessage.isNotEmpty()) {
             Snackbar(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                containerColor = PrimaryBrown.copy(alpha = 0.9f),
-                contentColor = Color.White, // Texto blanco
+                modifier = Modifier.padding(innerPadding),
+                containerColor = ProductoScreenAdminColors.DulceDeliciasDanger,
+                contentColor = ProductoScreenAdminColors.DulceDeliciasOnPrimary,
                 action = {
                     Button(
                         onClick = { viewModel.errorMessage.value = "" },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ProductoScreenAdminColors.DulceDeliciasOnPrimary,
+                            contentColor = ProductoScreenAdminColors.DulceDeliciasDanger
+                        )
                     ) {
-                        Text("Cerrar", color = PrimaryBrown)
+                        Text("Cerrar")
                     }
                 }
             ) {
@@ -128,34 +131,4 @@ fun ProductoScreenAdmin(
             }
         }
     }
-}
-
-@Composable
-fun DeleteConfirmDialog(
-    producto: Producto,
-    onConfirm: (Int) -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Confirmar Eliminación", color = PrimaryBrown) },
-        text = { Text("¿Estás seguro de eliminar ${producto.nombre}?") },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(producto.id) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) { Text("Sí, Eliminar") }
-        },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onDismiss,
-                border = ButtonDefaults.outlinedButtonBorder.copy(
-                    brush = androidx.compose.ui.graphics.SolidColor(PrimaryBrown)
-                ),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBrown
-                )
-            ) { Text("Cancelar") }
-        }
-    )
 }

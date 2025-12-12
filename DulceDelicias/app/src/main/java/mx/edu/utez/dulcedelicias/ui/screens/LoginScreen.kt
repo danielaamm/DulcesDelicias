@@ -3,23 +3,28 @@ package mx.edu.utez.dulcedelicias.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import mx.edu.utez.dulcedelicias.R
 import mx.edu.utez.dulcedelicias.ui.screens.viewmodel.LoginViewModel
+
+val PrimaryBrown = Color(0xFF6D4C41)
+val LightBrownBackground = Color(0xFFF5EFE7)
+val AccentBrown = Color(0xFFBCAAA4)
+val TextLight = Color(0xFFFFFFFF)
 
 @Composable
 fun LoginScreen(
@@ -32,10 +37,6 @@ fun LoginScreen(
     val mensaje by viewModel.mensaje.observeAsState("")
     val loginExitoso by viewModel.loginExitoso.observeAsState(false)
 
-    val PrimaryBrown = Color(0xFF6D4C41)
-    val BackgroundCream = Color(0xFFFFF8E1)
-    val AccentGold = Color(0xFFFFB74D)
-
     LaunchedEffect(loginExitoso) {
         if (loginExitoso) {
             navController.navigate("screenAdmin") {
@@ -46,89 +47,63 @@ fun LoginScreen(
     }
 
     Column(
-        modifier = Modifier
-            .statusBarsPadding()
-            .fillMaxSize()
-            .background(color = BackgroundCream)
-            .padding(24.dp),
+        modifier = Modifier.statusBarsPadding().fillMaxSize()
+            .background(LightBrownBackground).padding(horizontal = 60.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Text(
-            text = "Bienvenido a Dulces Delicias",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = PrimaryBrown,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
         Image(
             painter = painterResource(R.drawable.dulcedelicias),
-            contentDescription = "Logo de la pastelería",
-            modifier = Modifier
-                .size(180.dp)
-                .padding(bottom = 32.dp)
+            contentDescription = "Inicio de sesión",
+            modifier = Modifier.size(230.dp)
         )
-
 
         OutlinedTextField(
             value = usuario,
             onValueChange = { usuario = it },
-            label = { Text(text = "Usuario") },
+            label = { Text(text = "Usuario", color = PrimaryBrown) },
+            modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryBrown,
-                unfocusedBorderColor = PrimaryBrown.copy(alpha = 0.5f),
+                unfocusedBorderColor = AccentBrown,
+                focusedLabelColor = PrimaryBrown,
                 cursorColor = PrimaryBrown,
-                focusedLabelColor = PrimaryBrown
-            ),
-            modifier = Modifier.fillMaxWidth(0.8f).padding(bottom = 16.dp)
+                focusedTextColor = PrimaryBrown,
+                unfocusedTextColor = PrimaryBrown
+            )
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = contrasena,
             onValueChange = { contrasena = it },
-            label = { Text(text = "Contraseña") },
+            label = { Text(text = "Contraseña", color = PrimaryBrown) },
             visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryBrown,
-                unfocusedBorderColor = PrimaryBrown.copy(alpha = 0.5f),
+                unfocusedBorderColor = AccentBrown,
+                focusedLabelColor = PrimaryBrown,
                 cursorColor = PrimaryBrown,
-                focusedLabelColor = PrimaryBrown
-            ),
-            modifier = Modifier.fillMaxWidth(0.8f).padding(bottom = 24.dp)
+                focusedTextColor = PrimaryBrown,
+                unfocusedTextColor = PrimaryBrown
+            )
         )
 
-        if (mensaje.isNotEmpty()) {
-            Text(
-                text = mensaje,
-                color = Color.Red,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth(0.8f)
-        ) {
-            Button(
-                onClick = {
-                    viewModel.autenticar(usuario, contrasena)
+        Text(text = mensaje, color = PrimaryBrown)
+
+        Button(
+            onClick = {
+                viewModel.autenticar(usuario, contrasena)
                 },
+                modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBrown,
-                    contentColor = Color.White
+                containerColor = PrimaryBrown,
+                contentColor = TextLight
                 ),
-                modifier = Modifier.weight(1f)
-            ) { Text(text = "Iniciar sesión", fontSize = 16.sp) }
-
-        }
+        ) { Text(text = "Iniciar sesión") }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginScreenPreview() {
-    val navController = rememberNavController()
-    LoginScreen(navController = navController)
 }

@@ -16,12 +16,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.graphics.vector.ImageVector
-
-import mx.edu.utez.dulcedelicias.ui.screens.ProductoScreenAdmin
 import mx.edu.utez.dulcedelicias.ui.screens.LoginScreen
 import mx.edu.utez.dulcedelicias.ui.screens.viewmodel.ProductoViewModel
 import mx.edu.utez.dulcedelicias.ui.screens.HomeScreen
 import mx.edu.utez.dulcedelicias.ui.screens.CarritoScreen
+import mx.edu.utez.dulcedelicias.ui.screens.components.ProductoScreenAdmin
 import mx.edu.utez.dulcedelicias.ui.screens.viewmodel.CarritoViewModel
 
 @Composable

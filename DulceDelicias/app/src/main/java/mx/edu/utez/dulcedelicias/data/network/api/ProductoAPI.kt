@@ -86,30 +86,35 @@ class ProductoAPI(private val context: Context) {
         producto: Producto,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    ){
+    ) {
         val url = "$baseURL/productos"
-        val metodo = Request.Method.POST
-        val body = JSONObject()
-        body.put("id", producto.id)
-        body.put("nombre", producto.nombre)
-        body.put("descripcion", producto.descripcion)
-        body.put("precio", producto.precio)
-        body.put("stock", producto.stock)
-        body.put("disponible", producto.disponible)
-        body.put("imagenUrl", producto.imagenUrl)
-        val listener = Response.Listener<JSONObject>{ response ->
-            if(response.getInt("affectedRows") == 1){
-                onSuccess()
+        val body = JSONObject().apply {
+            put("nombre", producto.nombre)
+            put("descripcion", producto.descripcion)
+            put("precio", producto.precio)
+            put("stock", producto.stock)
+            put("disponible", producto.disponible)
+            put("imagen_url", producto.imagenUrl)
+        }
+
+        val request = JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            body,
+            { response ->
+                if (response.optBoolean("exito")) {
+                    onSuccess()
+                } else {
+                    onError(response.optString("mensaje", "Error desconocido"))
+                }
+            },
+            { error ->
+                onError(error.message ?: "Error desconocido")
             }
-        }
-        val errorListener = Response.ErrorListener{ error ->
-            onError(error.message.toString())
-        }
-        val request = JsonObjectRequest(metodo, url, body,
-            listener, errorListener
         )
         VolleySingleton.getInstance(context).add(request)
     }
+
 
 
     fun update(
