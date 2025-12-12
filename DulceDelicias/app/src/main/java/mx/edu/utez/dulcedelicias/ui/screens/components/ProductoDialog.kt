@@ -1,6 +1,5 @@
 package mx.edu.utez.dulcedelicias.ui.screens.components
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -17,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import mx.edu.utez.dulcedelicias.data.network.model.Producto
+
 private object ProductoDialogColors {
     val DulceDeliciasPrimary = Color(0xFF6D4C41)
     val DulceDeliciasOnPrimary = Color.White
@@ -24,7 +24,7 @@ private object ProductoDialogColors {
     val DulceDeliciasOnSecondary = Color(0xFF1F1B16)
     val DulceDeliciasSurface = Color(0xFFFFFDE7)
     val DulceDeliciasOutline = Color(0xFFC6A49A)
-    val DulceDeliciasDanger = Color(0xFFB71C1C)
+    val DulceDeliciasDanger = Color(0xFF6D4C41)
     val DulceDeliciasOnDanger = Color.White
 }
 
@@ -39,6 +39,8 @@ fun ProductoDialog(
     var stockText by remember { mutableStateOf("") }
 
     val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = ProductoDialogColors.DulceDeliciasSecondary,
+        unfocusedTextColor = ProductoDialogColors.DulceDeliciasSecondary,
         focusedBorderColor = ProductoDialogColors.DulceDeliciasPrimary,
         unfocusedBorderColor = ProductoDialogColors.DulceDeliciasOutline,
         focusedLabelColor = ProductoDialogColors.DulceDeliciasPrimary,
@@ -106,7 +108,6 @@ fun ProductoDialog(
     )
 }
 
-
 @Composable
 fun ProductoUpdateDialog(
     producto: Producto,
@@ -118,7 +119,10 @@ fun ProductoUpdateDialog(
     var precioText by remember { mutableStateOf(producto.precio.toString()) }
     var stockText by remember { mutableStateOf(producto.stock.toString()) }
 
+    // Configuración de colores para los campos de texto
     val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = ProductoDialogColors.DulceDeliciasSecondary,
+        unfocusedTextColor = ProductoDialogColors.DulceDeliciasSecondary,
         focusedBorderColor = ProductoDialogColors.DulceDeliciasPrimary,
         unfocusedBorderColor = ProductoDialogColors.DulceDeliciasOutline,
         focusedLabelColor = ProductoDialogColors.DulceDeliciasPrimary,
@@ -192,6 +196,7 @@ fun ProductoUpdateDialog(
         onDismissRequest = onDismiss
     )
 }
+
 @Composable
 fun DeleteConfirmDialog(
     producto: Producto,

@@ -1,5 +1,7 @@
 package mx.edu.utez.dulcedelicias.ui.screens
 
+
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,9 +15,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import mx.edu.utez.dulcedelicias.R
@@ -28,9 +32,14 @@ val TextLight = Color(0xFFFFFFFF)
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    navController: NavController
 ) {
+    val context = LocalContext.current
+    val app = context.applicationContext as Application
+    val viewModel: LoginViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(app)
+    )
+
     var usuario by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
 
@@ -47,8 +56,11 @@ fun LoginScreen(
     }
 
     Column(
-        modifier = Modifier.statusBarsPadding().fillMaxSize()
-            .background(LightBrownBackground).padding(horizontal = 60.dp),
+        modifier = Modifier
+            .statusBarsPadding()
+            .fillMaxSize()
+            .background(LightBrownBackground)
+            .padding(horizontal = 60.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -96,14 +108,12 @@ fun LoginScreen(
         Text(text = mensaje, color = PrimaryBrown)
 
         Button(
-            onClick = {
-                viewModel.autenticar(usuario, contrasena)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
+            onClick = { viewModel.autenticar(usuario, contrasena) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
                 containerColor = PrimaryBrown,
                 contentColor = TextLight
-                ),
+            ),
         ) { Text(text = "Iniciar sesión") }
     }
 }

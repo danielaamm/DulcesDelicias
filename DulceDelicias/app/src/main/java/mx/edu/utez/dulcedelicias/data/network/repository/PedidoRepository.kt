@@ -1,20 +1,22 @@
 package mx.edu.utez.dulcedelicias.data.network.repository
 
+import PedidoAPI
 import android.content.Context
-import mx.edu.utez.dulcedelicias.data.network.api.PedidoAPI
-import mx.edu.utez.dulcedelicias.data.network.model.DetallePedido
+import mx.edu.utez.dulcedelicias.data.network.dao.PedidoDao
+import mx.edu.utez.dulcedelicias.data.network.model.PedidoRequest
+import mx.edu.utez.dulcedelicias.data.network.model.PedidoResponse
 
-class PedidoRepository(private val api: PedidoAPI) {
-    fun crearPedido(
-        nombreCliente: String,
-        ubicacion: String,
-        total: Double,
-        detalles: List<DetallePedido>,
-        onSuccess: (Int) -> Unit,
+class PedidoRepository(context: Context) : PedidoDao {
+    private val api = PedidoAPI(context)
+
+    override fun create(
+        pedido: PedidoRequest,
+        onSuccess: (PedidoResponse) -> Unit,
         onError: (String) -> Unit
     ) {
-        api.crearPedido(nombreCliente, ubicacion, total, detalles, onSuccess, onError)
+        api.create(pedido, onSuccess, onError)
     }
 }
+
 
 

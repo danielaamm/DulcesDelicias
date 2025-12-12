@@ -9,7 +9,7 @@ import mx.edu.utez.dulcedelicias.data.network.model.LoginResponse
 import org.json.JSONObject
 
 class AutenticacionAPI(private val context: Context) {
-    val baseURL = "http://192.168.0.9:3000/api"
+    val baseURL = "http://192.168.110.84:3000/api"
 
     //Autenticacion
     fun iniciarSesion(

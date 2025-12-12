@@ -3,53 +3,77 @@ package mx.edu.utez.dulcedelicias.ui.screens.viewmodel
 import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
-import mx.edu.utez.dulcedelicias.data.network.api.PedidoAPI
-import mx.edu.utez.dulcedelicias.data.network.model.DetallePedido
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import mx.edu.utez.dulcedelicias.data.local.db.AppDatabase
+import mx.edu.utez.dulcedelicias.data.local.model.CarritoItemEntity
+import mx.edu.utez.dulcedelicias.data.network.model.DetalleData
+import mx.edu.utez.dulcedelicias.data.network.model.PedidoData
+import mx.edu.utez.dulcedelicias.data.network.model.PedidoRequest
 import mx.edu.utez.dulcedelicias.data.network.model.Producto
 import mx.edu.utez.dulcedelicias.data.network.repository.PedidoRepository
 
 class CarritoViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val pedidoRepository = PedidoRepository(PedidoAPI(application))
+    private val carritoDao = AppDatabase.getDatabase(application).carritoDao()
+    private val pedidoRepository = PedidoRepository(application.applicationContext)
 
-    private var _carrito = mutableStateListOf<Pair<Producto, DetallePedido>>()
-    val carrito: List<Pair<Producto, DetallePedido>> get() = _carrito
+    private var _carrito = mutableStateListOf<CarritoItemEntity>()
+    val carrito: List<CarritoItemEntity> get() = _carrito
+
+    init {
+        viewModelScope.launch {
+            _carrito.clear()
+            _carrito.addAll(carritoDao.getCarrito())
+        }
+    }
 
     fun agregarProducto(producto: Producto) {
-        val index = _carrito.indexOfFirst { it.first.id == producto.id }
-        if (index >= 0) {
-            val actual = _carrito[index].second
-            val actualizado = actual.copy(cantidad = actual.cantidad + 1)
-            _carrito[index] = producto to actualizado
-        } else {
-            val nuevoDetalle = DetallePedido(
-                idDetalle = 0,
-                idPedido = 0,
-                idProducto = producto.id,
-                cantidad = 1,
-                precioUnitario = producto.precio
-            )
-            _carrito.add(producto to nuevoDetalle)
-        }
-    }
-
-    fun incrementar(detalle: DetallePedido) {
-        val index = _carrito.indexOfFirst { it.second.idProducto == detalle.idProducto }
-        if (index >= 0) {
-            val (producto, actual) = _carrito[index]
-            _carrito[index] = producto to actual.copy(cantidad = actual.cantidad + 1)
-        }
-    }
-
-    fun decrementar(detalle: DetallePedido) {
-        val index = _carrito.indexOfFirst { it.second.idProducto == detalle.idProducto }
-        if (index >= 0) {
-            val (producto, actual) = _carrito[index]
-            if (actual.cantidad > 1) {
-                _carrito[index] = producto to actual.copy(cantidad = actual.cantidad - 1)
+        viewModelScope.launch {
+            val existente = _carrito.find { it.productoId == producto.id }
+            if (existente != null) {
+                val actualizado = existente.copy(cantidad = existente.cantidad + 1)
+                carritoDao.actualizarProducto(actualizado)
             } else {
-                _carrito.removeAt(index)
+                val nuevo = CarritoItemEntity(
+                    productoId = producto.id,
+                    nombre = producto.nombre,
+                    precioUnitario = producto.precio,
+                    cantidad = 1
+                )
+                carritoDao.agregarProducto(nuevo)
             }
+            _carrito.clear()
+            _carrito.addAll(carritoDao.getCarrito())
+        }
+    }
+
+    fun incrementar(item: CarritoItemEntity) {
+        viewModelScope.launch {
+            val actualizado = item.copy(cantidad = item.cantidad + 1)
+            carritoDao.actualizarProducto(actualizado)
+            _carrito.clear()
+            _carrito.addAll(carritoDao.getCarrito())
+        }
+    }
+
+    fun decrementar(item: CarritoItemEntity) {
+        viewModelScope.launch {
+            if (item.cantidad > 1) {
+                val actualizado = item.copy(cantidad = item.cantidad - 1)
+                carritoDao.actualizarProducto(actualizado)
+            } else {
+                carritoDao.eliminarProducto(item)
+            }
+            _carrito.clear()
+            _carrito.addAll(carritoDao.getCarrito())
+        }
+    }
+
+    fun limpiarCarrito() {
+        viewModelScope.launch {
+            carritoDao.limpiarCarrito()
+            _carrito.clear()
         }
     }
 
@@ -60,10 +84,32 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         onSuccess: (Int) -> Unit,
         onError: (String) -> Unit
     ) {
-        val subtotal = _carrito.sumOf { it.second.precioUnitario * it.second.cantidad }
+        val subtotal = _carrito.sumOf { it.precioUnitario * it.cantidad }
         val total = subtotal + envio
-        val detalles = _carrito.map { it.second }
 
-        pedidoRepository.crearPedido(nombreCliente, ubicacion, total, detalles, onSuccess, onError)
+        val detalles = _carrito.map {
+            DetalleData(idProducto = it.productoId, cantidad = it.cantidad)
+        }
+
+        val request = PedidoRequest(
+            pedido = PedidoData(
+                nombre_cliente = nombreCliente,
+                ubicacion = ubicacion,
+                total = total
+            ),
+            detalles = detalles
+        )
+
+        pedidoRepository.create(
+            pedido = request,
+            onSuccess = { response ->
+                limpiarCarrito()
+                onSuccess(response.idPedido ?: -1)
+            },
+            onError = { error ->
+                onError(error)
+            }
+        )
     }
 }
+

@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mx.edu.utez.dulcedelicias.data.network.model.DetallePedido
 import mx.edu.utez.dulcedelicias.data.network.model.Producto
+import mx.edu.utez.dulcedelicias.ui.theme.PrimaryBrown
+import mx.edu.utez.dulcedelicias.ui.theme.BackgroundCream
 
 @Composable
 fun CarritoCard(
@@ -21,44 +23,69 @@ fun CarritoCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(12.dp)
+            .padding(vertical = 6.dp, horizontal = 12.dp)
             .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(containerColor = BackgroundCream),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = producto.nombre,
+                style = MaterialTheme.typography.titleMedium,
+                color = PrimaryBrown
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Precio unitario: $${"%.2f".format(detallePedido.precioUnitario)}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = PrimaryBrown.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // Subtotal
+            Text(
+                text = "Subtotal: $${"%.2f".format(detallePedido.cantidad * detallePedido.precioUnitario)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = PrimaryBrown
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Controles de cantidad
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                IconButton(
+                    onClick = { onDecrement(detallePedido) },
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = PrimaryBrown)
+                ) {
+                    Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Disminuir cantidad")
+                }
+
                 Text(
-                    text = "Precio unitario: $${"%.2f".format(detallePedido.precioUnitario)}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Subtotal: $${"%.2f".format(detallePedido.cantidad * detallePedido.precioUnitario)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
+                    text = detallePedido.cantidad.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = PrimaryBrown,
+                    modifier = Modifier.padding(horizontal = 12.dp)
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { onDecrement(detallePedido) }) {
-                        Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Disminuir cantidad")
-                    }
-                    Text(
-                        text = detallePedido.cantidad.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                    IconButton(onClick = { onIncrement(detallePedido) }) {
-                        Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Aumentar cantidad")
-                    }
+                IconButton(
+                    onClick = { onIncrement(detallePedido) },
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = PrimaryBrown)
+                ) {
+                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Aumentar cantidad")
                 }
             }
         }
     }
 }
+
