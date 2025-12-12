@@ -51,6 +51,7 @@ fun ProductoCardAdmin(
             }
             Spacer(modifier = Modifier.width(16.dp))
 
+            // Botón de Edición
             IconButton(onClick = { onEdit(producto) }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
@@ -59,6 +60,7 @@ fun ProductoCardAdmin(
                 )
             }
 
+            // Botón de Eliminación
             IconButton(onClick = { onDelete(producto) }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,

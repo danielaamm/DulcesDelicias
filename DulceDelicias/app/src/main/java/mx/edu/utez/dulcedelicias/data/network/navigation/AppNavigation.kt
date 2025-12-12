@@ -5,7 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import mx.edu.utez.dulcedelicias.ui.screens.ProductoScreenAdmin
+import mx.edu.utez.dulcedelicias.ui.screens.components.ProductoScreenAdmin
 
 import mx.edu.utez.dulcedelicias.ui.screens.components.LoginScreen
 import mx.edu.utez.dulcedelicias.ui.screens.viewmodel.ProductoViewModel
